@@ -28,15 +28,15 @@ netsh wlan set hostednetwork mode=allow ssid=%ssid% key=%pass% >> %logd% && (
 ) || (echo: ^>failed in creating virtual host.&notepad %logd%)
 >nul 2>&1 timeout /t "5"
 echo:Exiting..
-timeout  /t "10"
+endlocal
 exit /b
 
 :ssid <rtrnvar>
-setlocal enabledelayedexpansion
+setlocal disabledelayedexpansion
 set rtry=5
 :rtry_ssid
-if "%rtry%" lss "5" call:banner
-if "%rtry%" lss "0" echo:Too many retries. &exit /b 1
+if %rtry% lss 5 call:banner
+if %rtry% lss 1 (echo:Too many retries. &exit /b 1)
 set /p ".=Name/SSID:"<nul
 if "%~2" neq "" (echo:^(Auto Setting^ - %~2^) &set "ssid=%~2" &>nul 2>&1 timeout "1") else (set /p "ssid=")
 if "%ssid%" equ "" set /a "rtry-=1"&set /p ".=Empty Field is not allowed. Try Again.. %rtry% Attempt(s) Remaining."<nul&>nul 2>&1 timeout "2"&goto:rtry_ssid
@@ -46,11 +46,11 @@ if "%ssid%" equ "" set /a "rtry-=1"&set /p ".=Empty Field is not allowed. Try Ag
 exit /b
 
 :pass <rtrnvar>
-setlocal
+setlocal disabledelayedexpansion
 set rtry=5
 :rtry_pass
-if "%rtry%" lss "5" call:banner
-if "%rtry%" lss "0" echo:Too many retries. &exit /b 1
+if %rtry% lss 5 call:banner
+if %rtry% lss 1 (echo:Too many retries. &exit /b 1)
 set /p ".=Passd/Key:"<nul
 if "%~2" neq "" (echo:^(Auto Setting^ - %~2^) &set "pass=%~2" &>nul 2>&1 timeout "1") else (set /p "pass=")
 if "%pass%" equ "" set /a "rtry-=1"&set /p ".=Empty Field is not allowed. Try Again.. %rtry% Attempt(s) Remaining."<nul&>nul 2>&1 timeout "2"&goto:rtry_pass
@@ -60,11 +60,12 @@ if "%pass%" equ "" set /a "rtry-=1"&set /p ".=Empty Field is not allowed. Try Ag
 exit /b
 
 :banner
-setlocal
 cls
+setlocal
 echo:Hotspot Setup Script
 echo:By: Christian Arvin
 echo.
 if not "%ssid%" equ "" echo:Name/SSID:%ssid%
 if not "%pass%" equ "" echo:Passd/key:%pass%&echo.
+endlocal
 exit /b
